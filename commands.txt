@@ -1,0 +1,2 @@
+client_get test.txt 192.168.1.8 8080
+client_post test.txt 192.168.1.8 8080
