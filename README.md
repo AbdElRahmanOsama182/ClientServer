@@ -80,7 +80,7 @@ def adjust_timeout():
     - It supports persistent connections and adjusts timeouts based on server load.
     - Manages multiple client connections using threads.
     
-2. Client
+2. **Client**
     - Reads commands from a file.
     - Sends HTTP-like requests (GET or POST) to the server based on the commands.
     - Handles file download (GET) and upload (POST).
@@ -141,8 +141,4 @@ def adjust_timeout():
 
 Abdelrhman Osama Hassan
 
-<<<<<<< HEAD
 Abdelrhman Mohamed Deif
-=======
-Abdelrhman Mohamed Deif
->>>>>>> f9cf23193081a3bf70b26b4d7e951a16d0063b25
