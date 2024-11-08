@@ -7,19 +7,26 @@ import time
 SERVER = socket.gethostbyname(socket.gethostname())
 HEADER = 4096
 FORMAT = 'utf-8'
-DEFAULT_IDLE_TIMEOUT = 10  # Default timeout in seconds
+IDLE_TIMEOUT = 10  # Default timeout in seconds
+
+def adjust_timeout():
+    connctions = threading.active_count() - 1
+    factor = 1 + (connctions // 5)
+    return IDLE_TIMEOUT / factor
+
 
 def handle_client(conn, addr):
     """Handles incoming client requests, supports persistent connections."""
-    conn.settimeout(DEFAULT_IDLE_TIMEOUT)
+    conn.settimeout(adjust_timeout())
     print(f"[NEW CONNECTION] {addr} connected.")
+    print(f"[TIMEOUT] Connection timeout set to {conn.gettimeout()} seconds.")
     try:
         while True:
             try:
                 # Receive and parse HTTP request
                 request = conn.recv(HEADER).decode(FORMAT)
                 if not request:
-                    print(f"[TIMEOUT] Connection with {addr} timed out.")
+                    print(f"[CLOSED] Connection with {addr} closed.")
                     break
 
                 headers = request.splitlines()
@@ -35,6 +42,7 @@ def handle_client(conn, addr):
                     else:
                         response = "HTTP/1.1 404 Not Found\r\nConnection: keep-alive\r\n\r\nFile Not Found".encode(FORMAT)
                     conn.sendall(response)
+                    conn.settimeout(adjust_timeout())
 
                 elif method == "POST":
                     file_name = path.lstrip("/")
@@ -46,6 +54,7 @@ def handle_client(conn, addr):
 
                     response = "HTTP/1.1 200 OK\r\nConnection: keep-alive\r\n\r\n".encode(FORMAT)
                     conn.sendall(response)
+                    conn.settimeout(adjust_timeout())
 
                     # Receive file content
                     bytes_received = 0
@@ -61,7 +70,7 @@ def handle_client(conn, addr):
                 else:
                     response = "HTTP/1.1 405 Method Not Allowed\r\nConnection: keep-alive\r\n\r\n".encode(FORMAT)
                     conn.sendall(response)
-
+                    conn.settimeout(adjust_timeout())
             except socket.timeout:
                 print(f"[TIMEOUT] Connection with {addr} timed out.")
                 break
@@ -78,7 +87,6 @@ def start_server(port):
     print(f"[LISTENING] Server listening on {SERVER}:{port}")
     while True:
         conn, addr = server.accept()
-        conn.settimeout(DEFAULT_IDLE_TIMEOUT)
         thread = threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
