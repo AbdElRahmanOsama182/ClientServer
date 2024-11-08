@@ -9,7 +9,6 @@ SERVER = socket.gethostbyname(socket.gethostname())
 HEADER = 4096
 FORMAT = 'utf-8'
 IDLE_TIMEOUT = 10  # Default timeout in seconds
-SERVER_PATH = "server"
 
 def adjust_timeout():
     connections = threading.active_count() - 1
@@ -33,7 +32,6 @@ def handle_client(conn, addr):
 
                 headers = request.splitlines()
                 method, path, _ = headers[0].split()
-                path = SERVER_PATH + path
                 print(f"[REQUEST] Method: {method}, Path: {path}")
 
                 if method == "GET":
