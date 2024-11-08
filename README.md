@@ -23,8 +23,8 @@ This application consists of a server and a client that communicate using HTTP-l
  Clone the repository
 
 ```bash
-git clone https://github.com/AbdElRahmanOsama182/SocketProgramming.git
-cd SocketProgramming
+git clone <repository_url>
+cd <repository_name>
 ```
 
 ## Usage
@@ -47,8 +47,8 @@ The client requires a command file and the server's IP address to connect. Optio
 The command file should contain one command per line, structured as follows:
 
 ```
-client_get example.txt 192.168.1.10 8080
-client_post upload.txt 192.168.1.10 8080
+client_get example.txt server_ip_address port
+client_post upload.txt server_ip_address port
 ```
 
 **Execute Commands**
