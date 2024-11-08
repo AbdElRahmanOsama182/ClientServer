@@ -141,4 +141,8 @@ def adjust_timeout():
 
 Abdelrhman Osama Hassan
 
+<<<<<<< HEAD
 Abdelrhman Mohamed Deif
+=======
+Abdelrhman Mohamed Deif
+>>>>>>> f9cf23193081a3bf70b26b4d7e951a16d0063b25
