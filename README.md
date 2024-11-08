@@ -23,8 +23,8 @@ This application consists of a server and a client that communicate using HTTP-l
  Clone the repository
 
 ```bash
-git clone <repository_url>
-cd <repository_name>
+git clone https://github.com/AbdElRahmanOsama182/SocketProgramming.git
+cd SocketProgramming
 ```
 
 ## Usage
