@@ -124,7 +124,7 @@ def adjust_timeout():
 ![browser_test.png](assets/browser_test.png)
 
 ## Performance Evaluation
-
+We conducted load testing with Locust to evaluate the server’s performance under increasing client numbers and requests. The tests revealed the relationship between request volume and response time, showing how performance changes as the load increases.
 ### Request Statistics
 
 ![request_Statistics.png](assets/request_statistics.png)
@@ -136,9 +136,9 @@ def adjust_timeout():
 ### Charts
 
 ![charts.png](assets/charts.png)
+![response_time_vs_users.png](assets/plot.png)
 
 ## Contributors
 
-Abdelrhman Osama Hassan
-
-Abdelrhman Mohamed Deif
+- Abdelrhman Osama Hassan
+- Abdelrhman Mohamed Deif
