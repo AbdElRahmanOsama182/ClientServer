@@ -36,18 +36,26 @@ def handle_client(conn, addr):
                 headers = request.splitlines()
                 method, path, _ = headers[0].split()
                 print(f"[REQUEST] Method: {method}, Path: {path}")
-
                 if method == "GET":
+
                     file_path = path.lstrip("/")
-                    # If file exists, send 200 response with file content
                     if os.path.isfile(file_path):
+                        file_size = os.path.getsize(file_path)
+                        response_headers = (
+                            f"HTTP/1.1 200 OK\r\n"
+                            f"Content-Length: {file_size}\r\n"
+                            f"Connection: keep-alive\r\n\r\n"
+                        ).encode(FORMAT)
+                        conn.sendall(response_headers)
                         with open(file_path, "rb") as file:
-                            response_data = file.read()
-                        response = f"HTTP/1.1 200 OK\r\nConnection: keep-alive\r\n\r\n".encode(FORMAT) + response_data
-                    # If file does not exist, send 404 response
+                            while chunk := file.read(HEADER):
+                                conn.sendall(chunk)
+
+                        print(f"[SENT] File '{file_path}' sent to {addr} with {file_size} bytes.")
                     else:
                         response = "HTTP/1.1 404 Not Found\r\nConnection: keep-alive\r\n\r\nFile Not Found".encode(FORMAT)
-                    conn.sendall(response)
+                        print(f"[ERROR] File '{file_path}' not found.")
+                        conn.sendall(response)
                     # Adjust timeout based on the number of active connections
                     conn.settimeout(adjust_timeout())
 
@@ -67,6 +75,7 @@ def handle_client(conn, addr):
 
                     # Receive file content and check if the content length is reached
                     bytes_received = 0
+                    file_name = os.path.basename(file_name)
                     with open(file_name, "wb") as file:
                         while bytes_received < content_length:
                             file_content = conn.recv(min(HEADER, content_length - bytes_received))
@@ -103,6 +112,7 @@ def start_server(port):
         thread.start()
         # Print the number of active connections
         print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
+        
 
 if __name__ == "__main__":
     # Check if the port number is provided as an argument
@@ -111,3 +121,4 @@ if __name__ == "__main__":
         sys.exit(1)
     PORT = int(sys.argv[1])
     start_server(PORT)
+    

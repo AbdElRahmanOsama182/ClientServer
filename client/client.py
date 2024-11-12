@@ -8,23 +8,42 @@ FORMAT = 'utf-8'
 DEFAULT_PORT = 80
 
 def client_get(file_path, host, port):
-    # Sends a GET request to the server to retrieve a file.
+    # Create a GET request and send it to the server
     request = f"GET /{file_path} HTTP/1.1\r\nHost: {host}\r\nConnection: keep-alive\r\n\r\n".encode(FORMAT)
     client.sendall(request)
-    # Receive response from server
+    
     response = client.recv(HEADER)
-    # Check if file was found on server
     if b"200 OK" in response:
-        with open(file_path.split("/")[-1], "wb") as file:
-            file.write(response.split(b"\r\n\r\n", 1)[1])
-        print(f"[RECEIVED] File '{file_path}' received from server.")
-    # If file was not found, print an error message
+        headers, initial_data = response.split(b"\r\n\r\n", 1)
+        content_length = 0
+        for line in headers.decode(FORMAT).split("\r\n"):
+            if line.startswith("Content-Length:"):
+                content_length = int(line.split(":")[1].strip())
+                break
+        # remove the whole path and keep only the file name
+        file_path = os.path.basename(file_path)
+        with open(file_path, "wb") as file:
+            file.write(initial_data)
+            bytes_received = len(initial_data)
+
+            while bytes_received < content_length:
+                chunk = client.recv(min(HEADER, content_length - bytes_received))
+                if not chunk:
+                    break
+                file.write(chunk)
+                bytes_received += len(chunk)
+
+        print(f"[RECEIVED] File '{file_path}' received from server with {bytes_received} bytes.")
     else:
         print("[ERROR] File not found on server.")
+
 
 def client_post(file_path, host, port):
     # Sends a POST request to the server to upload a file.
     # Read file data and calculate content length
+    if not os.path.isfile(file_path):
+        print(f"[ERROR] File '{file_path}' not found.")
+        return
     with open(file_path, "rb") as file:
         file_data = file.read()
     content_length = len(file_data)
